@@ -1,6 +1,11 @@
+.vscode/
+
+# Ignore build and devel folders
 devel/
 logs/
 build/
+install/
+log/
 bin/
 lib/
 msg_gen/
