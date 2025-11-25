@@ -15,7 +15,7 @@ setup(
     zip_safe=True,
     maintainer='jalenlv',
     maintainer_email='jalenlv543@gmail.com',
-    description='TODO: Package description',
+    description='Beginner client libraries tutorials practice package',
     license='Apache-2.0',
     extras_require={
         'test': [
