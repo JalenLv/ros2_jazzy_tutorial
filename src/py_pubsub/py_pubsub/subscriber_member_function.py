@@ -1,20 +1,20 @@
 import rclpy
 from rclpy.node import Node
 
-from std_msgs.msg import String
+from tutorial_interfaces.msg import Num
 
 class MinimalSubscriber(Node):
     def __init__(self):
         super().__init__("minimal_subscriber")
         self.subscription = self.create_subscription(
-            String,
+            Num,
             "topic",
             self.listener_callback,
             10
         )
 
-    def listener_callback(self, msg: String):
-        self.get_logger().info(f"I heard: {msg.data}")
+    def listener_callback(self, msg: Num):
+        self.get_logger().info(f"I heard: {msg.num}")
         
 def main(args=None):
     rclpy.init(args=args)
