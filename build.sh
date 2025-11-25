@@ -35,4 +35,5 @@ rm -f /tmp/rosdep_output.log
 colcon build --symlink-install --event-handlers console_direct+ --cmake-args \
     -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
     -DCMAKE_BUILD_TYPE=Debug \
-    -GNinja
+    -GNinja \
+    --parallel-workers $(( $(nproc) / 2 ))
