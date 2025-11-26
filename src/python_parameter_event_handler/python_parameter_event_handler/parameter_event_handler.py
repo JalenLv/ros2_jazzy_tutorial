@@ -18,6 +18,12 @@ class SampleNodeWithParameters(Node):
             callback=self.callback,
         )
 
+        self.handler.add_parameter_callback(
+            "a_double_param",
+            "parameter_blackboard",
+            self.callback,
+        )
+
     def callback(self, p: rclpy.parameter.Parameter) -> None:
         self.get_logger().info(
             "Received an update to parameter: {}: {}".format(
