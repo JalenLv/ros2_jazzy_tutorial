@@ -7,6 +7,7 @@ from rclpy.action.client import ClientGoalHandle
 
 from custom_action_interfaces.action import Fibonacci
 from custom_action_interfaces.action import Fibonacci_GetResult_Response
+from custom_action_interfaces.action import _fibonacci
 
 class FibonacciActionClient(Node):
     def __init__(self):
@@ -24,7 +25,7 @@ class FibonacciActionClient(Node):
         while not self._action_client.wait_for_server():
             self.get_logger().info("Waiting for action server...")
 
-        self._send_goal_future = self._action_client.send_goal_async(goal_msg)
+        self._send_goal_future = self._action_client.send_goal_async(goal_msg, self.feedback_callback)
         self._send_goal_future.add_done_callback(self.goal_response_callback)
 
     def goal_response_callback(self, future: Future):
@@ -43,6 +44,10 @@ class FibonacciActionClient(Node):
         result: Fibonacci.Result = get_result_response.result
         self.get_logger().info("Result: {}".format(result.sequence))
         rclpy.shutdown()
+
+    def feedback_callback(self, feedback_msg: _fibonacci.Fibonacci_FeedbackMessage):
+        feedback: Fibonacci.Feedback = feedback_msg.feedback
+        self.get_logger().info("Received feedback: {}".format(feedback.partial_sequence))
 
 def main():
     rclpy.init()
