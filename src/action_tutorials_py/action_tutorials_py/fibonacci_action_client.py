@@ -2,7 +2,11 @@ import rclpy
 from rclpy.node import Node
 from rclpy.action import ActionClient
 
+from rclpy.task import Future
+from rclpy.action.client import ClientGoalHandle
+
 from custom_action_interfaces.action import Fibonacci
+from custom_action_interfaces.action import Fibonacci_GetResult_Response
 
 class FibonacciActionClient(Node):
     def __init__(self):
@@ -20,17 +24,32 @@ class FibonacciActionClient(Node):
         while not self._action_client.wait_for_server():
             self.get_logger().info("Waiting for action server...")
 
-        return self._action_client.send_goal_async(goal_msg)
+        self._send_goal_future = self._action_client.send_goal_async(goal_msg)
+        self._send_goal_future.add_done_callback(self.goal_response_callback)
+
+    def goal_response_callback(self, future: Future):
+        goal_handle: ClientGoalHandle = future.result()
+        if not goal_handle.accepted:
+            self.get_logger().warn("Goal rejected :(")
+            return
+
+        self.get_logger().info("Goal accepted :)")
+
+        self._get_result_future: Future = goal_handle.get_result_async()
+        self._get_result_future.add_done_callback(self.get_result_callback)
+
+    def get_result_callback(self, future: Future):
+        get_result_response: Fibonacci_GetResult_Response = future.result()
+        result: Fibonacci.Result = get_result_response.result
+        self.get_logger().info("Result: {}".format(result.sequence))
+        rclpy.shutdown()
 
 def main():
     rclpy.init()
 
     fibonacci_action_client = FibonacciActionClient()
-    future = fibonacci_action_client.send_goal(10)
-    rclpy.spin_until_future_complete(fibonacci_action_client, future)
-
-    fibonacci_action_client.destroy_node()
-    rclpy.shutdown()
+    fibonacci_action_client.send_goal(10)
+    rclpy.spin(fibonacci_action_client)
 
 if __name__ == "__main__":
     main()
