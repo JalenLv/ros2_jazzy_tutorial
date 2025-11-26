@@ -25,6 +25,7 @@ setup(
     entry_points={
         'console_scripts': [
             "fibonacci_action_server = action_tutorials_py.fibonacci_action_server:main",
+            "fibonacci_action_client = action_tutorials_py.fibonacci_action_client:main",
         ],
     },
 )
