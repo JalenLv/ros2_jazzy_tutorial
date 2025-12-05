@@ -32,9 +32,21 @@ if [ $rosdep_exit_code -ne 0 ]; then
 fi
 rm -f /tmp/rosdep_output.log
 
-colcon build --symlink-install \
-    --event-handlers console_direct+ \
-    --cmake-args -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
-                 -DCMAKE_BUILD_TYPE=Release \
-                 -GNinja \
-    --parallel-workers "$(( $(nproc) / 2 ))" \
+if [ $# -eq 0 ]; then
+    # if argc == 0, build all packages
+    colcon build --symlink-install \
+        --event-handlers console_direct+ \
+        --cmake-args -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+                    -DCMAKE_BUILD_TYPE=Release \
+                    -GNinja \
+        --parallel-workers "$(( $(nproc) / 2 ))"
+else
+    # if argc > 0, build only specified packages
+    colcon build --symlink-install \
+        --event-handlers console_direct+ \
+        --cmake-args -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+                    -DCMAKE_BUILD_TYPE=Release \
+                    -GNinja \
+        --parallel-workers "$(( $(nproc) / 2 ))" \
+        --packages-select "$@"
+fi
