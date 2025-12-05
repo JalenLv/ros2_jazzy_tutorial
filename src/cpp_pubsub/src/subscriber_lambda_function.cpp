@@ -1,22 +1,22 @@
 #include <memory>
 
 #include "rclcpp/rclcpp.hpp"
-#include "std_msgs/msg/string.hpp"
+#include "tutorial_interfaces/msg/num.hpp"
 
 class MinimalSubscriber : public rclcpp::Node {
 public:
     MinimalSubscriber() : Node("minimal_subscriber") {
         auto topic_callback =
-            [this](std_msgs::msg::String::UniquePtr msg) -> void {
-                RCLCPP_INFO(this->get_logger(), "I heard: '%s'", msg->data.c_str());
+            [this](const tutorial_interfaces::msg::Num &msg) -> void {
+                RCLCPP_INFO_STREAM(this->get_logger(), "I heard: '" << msg.num << "'");
             };
-            subscription_ = this->create_subscription<std_msgs::msg::String>(
-                "topic", 10, topic_callback
-            );
+        subscription_ = this->create_subscription<tutorial_interfaces::msg::Num>(
+            "topic", 10, topic_callback
+        );
     }
 
 private:
-    rclcpp::Subscription<std_msgs::msg::String>::SharedPtr subscription_;
+    rclcpp::Subscription<tutorial_interfaces::msg::Num>::SharedPtr subscription_;
 };
 
 int main(int argc, char **argv) {
