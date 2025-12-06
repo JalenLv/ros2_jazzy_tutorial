@@ -70,7 +70,7 @@ private:
                 try {
                     t = tf_buffer_->lookupTransform(
                         toFrameRel, fromFrameRel,
-                        this->now()
+                        this->now() - rclcpp::Duration::from_seconds(0.1)
                     );
                 } catch(const tf2::TransformException &e) {
                     RCLCPP_WARN(this->get_logger(),
