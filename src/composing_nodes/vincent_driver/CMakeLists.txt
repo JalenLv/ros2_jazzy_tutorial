@@ -8,12 +8,32 @@ endif()
 # find dependencies
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
+find_package(rclcpp_components REQUIRED)
 
-add_executable(vincent_driver src/vincent_driver.cpp)
-ament_target_dependencies(vincent_driver rclcpp)
+add_library(vincent_driver_component SHARED
+  src/vincent_driver.cpp
+)
+ament_target_dependencies(vincent_driver_component
+  rclcpp
+  rclcpp_components
+)
+rclcpp_components_register_node(
+  vincent_driver_component
+  PLUGIN "palomino::VincentDriver"
+  EXECUTABLE vincent_driver
+)
+ament_export_targets(export_vincent_driver_component)
 install(
-  TARGETS vincent_driver
-  DESTINATION lib/${PROJECT_NAME}
+  TARGETS vincent_driver_component
+  EXPORT export_vincent_driver_component
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin
+)
+
+install(
+  DIRECTORY launch
+  DESTINATION share/${PROJECT_NAME}
 )
 
 if(BUILD_TESTING)

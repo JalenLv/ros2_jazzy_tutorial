@@ -6,16 +6,12 @@ namespace palomino {
 
 class VincentDriver : public rclcpp::Node {
 public:
-    VincentDriver() : Node("vincent_driver") {
+    VincentDriver(const rclcpp::NodeOptions &options) : Node("vincent_driver", options) {
         RCLCPP_INFO(this->get_logger(), "Hello from VincentDriver node!");
     }
 }; // class VincentDriver
 
 } // namespace palomino
 
-int main(int argc, char **argv) {
-    rclcpp::init(argc, argv);
-    rclcpp::spin(std::make_shared<palomino::VincentDriver>());
-    rclcpp::shutdown();
-    return 0;
-}
+#include "rclcpp_components/register_node_macro.hpp"
+RCLCPP_COMPONENTS_REGISTER_NODE(palomino::VincentDriver);
