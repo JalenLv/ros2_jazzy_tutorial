@@ -5,7 +5,8 @@
 class SampleNodeWithParameters : public rclcpp::Node {
 public:
     SampleNodeWithParameters() : Node("node_with_parameters") {
-        this->declare_parameter("an_int_param", 0);
+        this->declare_parameter<int>("an_int_param", 0);
+        this->declare_parameter<double>("another_double_param", 0.0);
 
         // Create a parameter subscriber that can be used to monitor parameter changes
         // (for this node's parameters as well as other nodes' parameters)
@@ -23,12 +24,17 @@ public:
         cb2_handle_ = param_subscriber_->add_parameter_callback(
             remote_param_name, cb2_lambda, remote_node_name
         );
+
+        auto event_cb_lambda =
+            [this] (const rcl_interfaces::msg::ParameterEvent &param_event) { event_cb(param_event); };
+        event_cb_handle_ = param_subscriber_->add_parameter_event_callback(event_cb_lambda);
     }
 
 private:
     std::shared_ptr<rclcpp::ParameterEventHandler> param_subscriber_;
     std::shared_ptr<rclcpp::ParameterCallbackHandle> cb_handle_;
     std::shared_ptr<rclcpp::ParameterCallbackHandle> cb2_handle_;
+    std::shared_ptr<rclcpp::ParameterEventCallbackHandle> event_cb_handle_;
 
     void cb(const rclcpp::Parameter &p) {
         RCLCPP_INFO(this->get_logger(),
@@ -46,6 +52,20 @@ private:
             p.get_type_name().c_str(),
             p.as_double()
         );
+    }
+
+    void event_cb(const rcl_interfaces::msg::ParameterEvent &param_event) {
+        RCLCPP_INFO(this->get_logger(),
+            "Received parameter event from node \"%s\"",
+            param_event.node.c_str()
+        );
+        for (const auto &p : param_event.changed_parameters) {
+            RCLCPP_INFO(this->get_logger(),
+                "Inside event: \"%s\" changed to %s",
+                p.name.c_str(),
+                rclcpp::Parameter::from_parameter_msg(p).value_to_string().c_str()
+            );
+        }
     }
 };
 
