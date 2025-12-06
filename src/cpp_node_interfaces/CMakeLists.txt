@@ -9,11 +9,13 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rclcpp_lifecycle REQUIRED)
+find_package(lifecycle_msgs REQUIRED)
 
 add_executable(simple_node src/simple_node.cpp)
 ament_target_dependencies(simple_node
   rclcpp
   rclcpp_lifecycle
+  lifecycle_msgs
 )
 install(
   TARGETS simple_node

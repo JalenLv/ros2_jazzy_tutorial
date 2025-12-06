@@ -1,6 +1,12 @@
 #include <memory>
+#include <string>
+#include <thread>
+
+#include "lifecycle_msgs/msg/transition.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "rclcpp_lifecycle/lifecycle_node.hpp"
+#include "rclcpp_lifecycle/lifecycle_publisher.hpp"
+#include "rclcpp/node_interfaces/node_interfaces.hpp"
 
 class SimpleNode : public rclcpp::Node {
 public:
@@ -16,10 +22,13 @@ public:
     ) {}
 };
 
-void node_info(
-    rclcpp::node_interfaces::NodeBaseInterface::SharedPtr base_interface,
-    rclcpp::node_interfaces::NodeLoggingInterface::SharedPtr logging_interface
-) {
+using MyNodeInterfaces =rclcpp::node_interfaces::NodeInterfaces<
+    rclcpp::node_interfaces::NodeBaseInterface, rclcpp::node_interfaces::NodeLoggingInterface
+>;
+
+void node_info(MyNodeInterfaces interfaces) {
+    auto base_interface = interfaces.get_node_base_interface();
+    auto logging_interface = interfaces.get_node_logging_interface();
     RCLCPP_INFO_STREAM(logging_interface->get_logger(), "Node name: " << base_interface->get_name());
 }
 
@@ -29,8 +38,8 @@ int main(int argc, char **argv) {
     rclcpp::executors::SingleThreadedExecutor exe;
     auto node = std::make_shared<SimpleNode>("simple_node");
     auto lc_node = std::make_shared<LifecycleTalker>("simple_lifecycle_node");
-    node_info(node->get_node_base_interface(), node->get_node_logging_interface());
-    node_info(lc_node->get_node_base_interface(), lc_node->get_node_logging_interface());
+    node_info(*node);
+    node_info(*lc_node);
 
     rclcpp::shutdown();
     return 0;
