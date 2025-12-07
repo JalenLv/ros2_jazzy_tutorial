@@ -1,6 +1,7 @@
 #include "rviz_plugin_tutorial/point_display.hpp"
 #include "rviz_common/logging.hpp"
 #include "rviz_common/properties/parse_color.hpp"
+#include "rviz_common/properties/status_property.hpp"
 
 namespace rviz_plugin_tutorial {
     
@@ -18,6 +19,15 @@ void PointDisplay::processMessage(
             "Error transforming from frame '" << msg->header.frame_id <<
             "' to frame '" << qPrintable(fixed_frame_) << "'";
         );
+    }
+
+    if (msg->x < 0) {
+        setStatus(
+            rviz_common::properties::StatusProperty::Warn, "Message",
+            "I will complain about points with negative x values."
+        );
+    } else {
+        setStatus(rviz_common::properties::StatusProperty::Ok, "Message", "OK");
     }
 
     scene_node_->setPosition(position);
