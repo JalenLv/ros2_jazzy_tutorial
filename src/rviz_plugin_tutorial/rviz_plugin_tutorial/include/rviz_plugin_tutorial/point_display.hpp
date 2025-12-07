@@ -3,6 +3,7 @@
 
 #include "rviz_common/message_filter_display.hpp"
 #include "rviz_plugin_tutorial_msgs/msg/point2_d.hpp"
+#include "rviz_rendering/objects/shape.hpp"
 
 namespace rviz_plugin_tutorial {
     
@@ -12,9 +13,12 @@ class PointDisplay : public
     Q_OBJECT
 
 protected:
+    std::unique_ptr<rviz_rendering::Shape> point_shape_;
+
     void processMessage(
         const rviz_plugin_tutorial_msgs::msg::Point2D::ConstSharedPtr msg
     ) override;
+    void onInitialize() override;
 };
 
 } // namespace rviz_plugin_tutorial
